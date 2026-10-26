@@ -1,0 +1,70 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 校验 SKILL.md frontmatter
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          text = Path("SKILL.md").read_text(encoding="utf-8")
+          assert text.startswith("---\n"), "SKILL.md 必须以 YAML frontmatter 开头"
+          fm = text.split("---", 2)[1]
+          for key in ("name:", "description:"):
+              assert key in fm, f"frontmatter 缺少 {key}"
+          print("frontmatter OK")
+          PY
+
+      - name: 脚本语法
+        run: python -m py_compile scripts/*.py
+
+      - name: 生成扫描结果
+        run: |
+          python scripts/privacy_scan.py examples/fixtures/leak.txt --json > /tmp/leak.json || true
+          python scripts/privacy_scan.py examples/fixtures/clean.txt --json > /tmp/clean.json || true
+
+      - name: 校准断言
+        run: |
+          python - <<'PY'
+          import json
+          leak = json.load(open("/tmp/leak.json", encoding="utf-8"))
+          clean = json.load(open("/tmp/clean.json", encoding="utf-8"))
+          print(f"泄露样本 命中 {leak['total']} 处（必删 {leak['counts']['high']}）"
+                f"  干净样本 {clean['total']} 处")
+          assert leak["counts"]["high"] >= 2, "漏掉了必删项"
+          assert clean["total"] == 0, f"干净文本误报 {clean['total']} 处"
+          print("calibration OK")
+          PY
+
+      - name: 有高危项时退出码 1
+        run: |
+          python scripts/privacy_scan.py examples/fixtures/clean.txt --fail-on high
+          if python scripts/privacy_scan.py examples/fixtures/leak.txt --fail-on high; then
+            echo "有必删项却没有触发退出码" && exit 1
+          else
+            echo "fail-on OK"
+          fi
+
+      - name: README 相对链接可解析
+        run: |
+          python - <<'PY'
+          import re
+          from pathlib import Path
+          text = Path("README.md").read_text(encoding="utf-8")
+          bad = [m.group(1) for m in re.finditer(r"\]\((\./[^)#]+)\)", text)
+                 if not Path(m.group(1)).exists()]
+          assert not bad, f"README 里有死链: {bad}"
+          print("links OK")
+          PY
