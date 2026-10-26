@@ -105,6 +105,15 @@ privacy-scan/
 2. **规则式匹配，会有漏。** 手写体、艺术字、图片里的文字它都看不到。
 3. **不判断「该不该发」。** 它只告诉你哪些信息敏感，发不发是你的判断。
 
+## 相关 skill
+
+- **内容与写作**：[爆款文案工坊](https://github.com/zhbehx/viral-copy) · [AI 味检测器](https://github.com/zhbehx/ai-tell)
+- **职场五件套**：[简历对岗改写](https://github.com/zhbehx/resume-tailor) · [面试陪练](https://github.com/zhbehx/interview-coach) · [汇报写作](https://github.com/zhbehx/weekly-report) · [PPT 叙事大纲](https://github.com/zhbehx/slide-story) · [会议纪要](https://github.com/zhbehx/meeting-actions)
+- **避坑与决策**：[JD 红旗检测](https://github.com/zhbehx/jd-redflag) · [合同风险扫描](https://github.com/zhbehx/contract-redflag) · [会议成本](https://github.com/zhbehx/meeting-cost)
+- **发布与沟通**：[职场语气](https://github.com/zhbehx/tone-check)
+
+共同点：零依赖、中文优先、每个都带一个确定性检查脚本。
+
 ## 自定义
 
 1. **加你们的内部标识**：`scripts/privacy_scan.py` 的 `RULES` 里加一条正则。
