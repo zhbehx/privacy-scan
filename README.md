@@ -134,3 +134,11 @@ A：小面积马赛克可以被部分还原，且容易漏边缘。**整块涂�
 ## License
 
 [MIT](./LICENSE)
+
+---
+
+本仓库是 [zhbehx 的 Agent Skill 合集](https://github.com/zhbehx) 之一。
+
+觉得有用就点个 ⭐，是我继续加词库、加行业的动力。
+
+<!-- zhbehx-collection-footer -->
